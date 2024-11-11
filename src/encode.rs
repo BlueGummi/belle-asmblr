@@ -9,9 +9,12 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
             if *num > 8 {
                 eprintln!("{}", "Register value cannot be greater than 7".bold().red());
             }
+            if CONFIG.debug {
+                println!("{:b}", num);
+            }
             *num
         }
-        Some(Token::Literal(literal)) => (1 << 7) | *literal,
+        Some(Token::Literal(literal)) => (1 << 8) | *literal,
         Some(Token::SR(sr)) | Some(Token::SRCall(sr)) => {
             let map = SUBROUTINE_MAP.lock().unwrap();
             let subroutine_value = map.get(sr);
@@ -39,7 +42,7 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
                     }
                 }
                 if !subroutine_map.contains_key(sr) {
-                    eprintln!("Subroutine \"{}\" does not exist.", sr);
+                    eprintln!("Subroutine \"{}\" does not exist.", sr.bold().red());
                 }
 
                 return *subroutine_map.get(sr).unwrap_or(&0);
@@ -62,6 +65,9 @@ pub fn write_encoded_instructions_to_file(
 pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token>) -> i16 {
     let mut subr: bool = false;
     let mut is_call: bool = false;
+    let mut is_st: bool = false;
+    let mut is_jmp: bool = false;
+    let mut is_int: bool = false;
     let instruction_bin = match ins {
         Token::Ident(ref instruction) => match instruction.to_uppercase().as_str() {
             "HLT" => 0b0000, // 0
@@ -77,13 +83,22 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
             "RET" => 0b0101, // 5
             "LD" => 0b0110,  // 6
-            "ST" => 0b0111,  // 7
-            "JMP" => 0b1000, // 8
+            "ST" => {
+                is_st = true;
+                0b0111 // 7
+            }
+            "JMP" => {
+                is_jmp = true;
+                0b1000 // 8
+            }
             "JZ" => 0b1001,  // 9
             "CMP" => 0b1010, // 10
             "SHL" => 0b1011, // 11
             "SHR" => 0b1100, // 12
-            "INT" => 0b1101, // 13
+            "INT" => {
+                is_int = true;
+                0b1101 // 13
+            }
             "MOV" => 0b1110, // 14
 
             _ => {
@@ -103,13 +118,17 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
         }
     };
-    if is_call {
-        return (instruction_bin << 12) | register_to_binary(reg1);
-    }
     if subr {
         return (instruction_bin << 12) | register_to_binary(Some(ins));
     }
+    if is_jmp | is_int | is_call {
+        return (instruction_bin << 12) | register_to_binary(reg1);
+    }
+    if is_st {
+        return (instruction_bin << 12) | (register_to_binary(reg1) << 3) | register_to_binary(reg2);
+    }
+
     let register_bin1 = register_to_binary(reg1);
     let register_bin2 = register_to_binary(reg2);
-    (instruction_bin << 12) | (register_bin1 << 8) | register_bin2
+    (instruction_bin << 12) | (register_bin1 << 9) | register_bin2
 }

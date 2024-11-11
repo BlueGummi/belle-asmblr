@@ -22,8 +22,15 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-
-                "CALL" | "JMP" | "INT" => {
+                "SHL" | "SHR" | "INT" => {
+                    let args_satisfied =
+                        (is_arg(arg1) && is_arg(arg2)) | (is_arg(arg1) && !is_arg(arg2));
+                    if !args_satisfied {
+                        err_msg = format!("{} requires one or two arguments", raw_token);
+                        has_error = true;
+                    }
+                }
+                "CALL" | "JMP" | "JZ" => {
                     if CONFIG.debug {
                         println!("arg1 {:?}, arg2 {:?}", arg1, arg2);
                     }

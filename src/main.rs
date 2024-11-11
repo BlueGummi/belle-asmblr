@@ -8,11 +8,11 @@ mod tokens;
 use tokens::*;
 mod verify;
 use colored::*;
+use once_cell::sync::Lazy;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::Path;
 use verify::*;
-use once_cell::sync::Lazy;
 
 static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 fn main() -> io::Result<()> {
@@ -72,6 +72,13 @@ fn main() -> io::Result<()> {
             encoded_instructions.extend(&encoded_instruction.to_be_bytes());
             if CONFIG.verbose {
                 println!("Instruction: {:016b}", encoded_instruction);
+                let ins_str: String = format!("{:016b}", encoded_instruction);
+                if let Some(ins) = ins_str.get(0..4) {
+                    println!("INS: {}", ins);
+                }
+                if let Some(dst) = ins_str.get(4..7) {
+                    println!("DST: {}", dst);
+                }
             }
         } else {
             println!(
