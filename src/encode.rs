@@ -64,10 +64,8 @@ pub fn write_encoded_instructions_to_file(
 }
 pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token>) -> i16 {
     let mut subr: bool = false;
-    let mut is_call: bool = false;
     let mut is_st: bool = false;
-    let mut is_jmp: bool = false;
-    let mut is_int: bool = false;
+    let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
         Token::Ident(ref instruction) => match instruction.to_uppercase().as_str() {
             "HLT" => 0b0000, // 0
@@ -78,7 +76,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 if CONFIG.debug {
                     println!("this is a call!");
                 }
-                is_call = true;
+                is_one_arg = true;
                 0b0100 // 4
             }
             "RET" => 0b0101, // 5
@@ -88,15 +86,18 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 0b0111 // 7
             }
             "JMP" => {
-                is_jmp = true;
+                is_one_arg = true;
                 0b1000 // 8
             }
-            "JZ" => 0b1001,  // 9
+            "JZ" => {
+                is_one_arg = true;
+                0b1001 // 9
+            }
             "CMP" => 0b1010, // 10
             "SHL" => 0b1011, // 11
             "SHR" => 0b1100, // 12
             "INT" => {
-                is_int = true;
+                is_one_arg = true;
                 0b1101 // 13
             }
             "MOV" => 0b1110, // 14
@@ -121,11 +122,13 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     if subr {
         return (instruction_bin << 12) | register_to_binary(Some(ins));
     }
-    if is_jmp | is_int | is_call {
+    if is_one_arg {
         return (instruction_bin << 12) | register_to_binary(reg1);
     }
     if is_st {
-        return (instruction_bin << 12) | (register_to_binary(reg1) << 3) | register_to_binary(reg2);
+        return (instruction_bin << 12)
+            | (register_to_binary(reg1) << 3)
+            | register_to_binary(reg2);
     }
 
     let register_bin1 = register_to_binary(reg1);

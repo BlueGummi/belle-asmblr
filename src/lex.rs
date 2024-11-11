@@ -123,12 +123,15 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                         "Value after # must be numeric literal: line {}",
                         line_number
                     );
+                    
+                     eprintln!("{}", number);
+                println!("skibidi debug {}", number);
                     std::process::exit(1);
                 }
                 let num_value = number[1..].parse::<i16>().unwrap();
-                if num_value >= 64 || num_value <= -64 {
+                if num_value >= 128 || num_value <= -128 {
                     eprintln!(
-                        "Numeric literal cannot be over +/- 64: line {}",
+                        "Numeric literal cannot be over +/- 128: line {}",
                         line_number
                     );
                     std::process::exit(1);
