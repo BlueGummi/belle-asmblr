@@ -1,0 +1,16 @@
+pub const HLT_OP: i16 = 0b0000;
+pub const ADD_OP: i16 = 0b0001;
+pub const AND_OP: i16 = 0b0010;
+pub const OR_OP: i16 = 0b0011;
+pub const CALL_OP: i16 = 0b0100;
+pub const RET_OP: i16 = 0b0101;
+pub const LD_OP: i16 = 0b0110;
+pub const ST_OP: i16 = 0b0111;
+pub const JMP_OP: i16 = 0b1000;
+pub const JZ_OP: i16 = 0b1001;
+pub const CMP_OP: i16 = 0b1010;
+pub const SHL_OP: i16 = 0b1011;
+pub const SHR_OP: i16 = 0b1100;
+pub const INT_OP: i16 = 0b1101;
+pub const MOV_OP: i16 = 0b1110;
+pub const SR_OP: i16 = 0b1111;
