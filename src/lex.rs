@@ -111,6 +111,12 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
             }
             '#' => {
                 let mut number = c.to_string();
+                if let Some(&next) = chars.peek() {
+                    if next == '-' {
+                        number.push(chars.next().unwrap());
+                    }
+                }
+
                 while let Some(&next) = chars.peek() {
                     if next.is_ascii_digit() {
                         number.push(chars.next().unwrap());
@@ -118,18 +124,17 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                         break;
                     }
                 }
+
                 if number[1..].parse::<i16>().is_err() {
                     eprintln!(
                         "Value after # must be numeric literal: line {}",
                         line_number
                     );
-                    
-                     eprintln!("{}", number);
-                println!("skibidi debug {}", number);
+                    eprintln!("{}", number);
                     std::process::exit(1);
                 }
                 let num_value = number[1..].parse::<i16>().unwrap();
-                if num_value >= 128 || num_value <= -128 {
+                if num_value > 128 || num_value < -128 {
                     eprintln!(
                         "Numeric literal cannot be over +/- 128: line {}",
                         line_number

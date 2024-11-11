@@ -68,39 +68,39 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
         Token::Ident(ref instruction) => match instruction.to_uppercase().as_str() {
-            "HLT" => 0b0000, // 0
-            "ADD" => 0b0001, // 1
-            "AND" => 0b0010, // 2
-            "OR" => 0b0011,  // 3
+            "HLT" => HLT_OP, // 0
+            "ADD" => ADD_OP, // 1
+            "AND" => AND_OP, // 2
+            "OR" => OR_OP,   // 3
             "CALL" => {
                 if CONFIG.debug {
                     println!("this is a call!");
                 }
                 is_one_arg = true;
-                0b0100 // 4
+                CALL_OP // 4
             }
-            "RET" => 0b0101, // 5
-            "LD" => 0b0110,  // 6
+            "RET" => RET_OP, // 5
+            "LD" => LD_OP,   // 6
             "ST" => {
                 is_st = true;
-                0b0111 // 7
+                ST_OP // 7
             }
             "JMP" => {
                 is_one_arg = true;
-                0b1000 // 8
+                JMP_OP // 8
             }
             "JZ" => {
                 is_one_arg = true;
-                0b1001 // 9
+                JZ_OP // 9
             }
-            "CMP" => 0b1010, // 10
-            "SHL" => 0b1011, // 11
-            "SHR" => 0b1100, // 12
+            "CMP" => CMP_OP, // 10
+            "SHL" => SHL_OP, // 11
+            "SHR" => SHR_OP, // 12
             "INT" => {
                 is_one_arg = true;
-                0b1101 // 13
+                INT_OP // 13
             }
-            "MOV" => 0b1110, // 14
+            "MOV" => MOV_OP, // 14
 
             _ => {
                 eprintln!("Instruction not recognized: {}", instruction);
@@ -113,9 +113,9 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 if CONFIG.debug {
                     println!("Subroutine detected");
                 }
-                0b1111
+                SR_OP
             } else {
-                0b0000
+                HLT_OP
             }
         }
     };

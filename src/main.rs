@@ -7,12 +7,14 @@ use lex::*;
 mod tokens;
 use tokens::*;
 mod verify;
+use verify::*;
+mod instructions;
 use colored::*;
+use instructions::*;
 use once_cell::sync::Lazy;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::Path;
-use verify::*;
 
 static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 fn main() -> io::Result<()> {
