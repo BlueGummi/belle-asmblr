@@ -1,0 +1,1 @@
+Currently, call and jmp and other instructions use similar encoding to the others, so they're limited to +/- 64, therefore we must redo that. Also, we should use once_cell to make a global hashmap to store subroutines, check if any conflict, 
