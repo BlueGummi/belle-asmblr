@@ -125,15 +125,18 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     }
                 }
 
-                if number[1..].parse::<i16>().is_err() {
-                    eprintln!(
-                        "Value after # must be numeric literal: line {}",
-                        line_number
-                    );
-                    eprintln!("{}", number);
-                    std::process::exit(1);
-                }
-                let num_value = number[1..].parse::<i16>().unwrap();
+                let num_value = match number[1..].parse::<i16>() {
+                    Ok(value) => value,
+                    Err(_) => {
+                        eprintln!(
+                            "Value after # must be numeric literal: line {}",
+                            line_number
+                        );
+                        eprintln!("{}", number);
+                        std::process::exit(1);
+                    }
+                };
+
                 if num_value > 128 || num_value < -128 {
                     eprintln!(
                         "Numeric literal cannot be over +/- 128: line {}",
@@ -141,7 +144,17 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     );
                     std::process::exit(1);
                 }
-                tokens.push(Token::Literal(num_value));
+
+                // if it is less than 0, bitflip first bit
+                let stored_value = if num_value < 0 {
+                    // first positive value as sign bit
+                    let positive_value = num_value.abs() as u8; // convert to positive
+                    (positive_value & 0x7F) | 0x80 // set the sign bit (flip first bit)
+                } else {
+                    num_value as i16
+                };
+
+                tokens.push(Token::Literal(stored_value as i16));
             }
             '$' => {
                 let mut addr = c.to_string();
@@ -166,7 +179,6 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 }
                 tokens.push(Token::MemAddr(addr_val));
             }
-
             _ => {
                 eprintln!("Unknown character: {}: line {}", c, line_number);
             }
