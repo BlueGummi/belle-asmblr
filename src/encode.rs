@@ -74,7 +74,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             "ST" => 0b0111,  // 7
             "JMP" => 0b1000, // 8
             "JZ" => 0b1001,  // 9
-            "MUL" => 0b1010, // 10
+            "CMP" => 0b1010, // 10
             "SHL" => 0b1011, // 11
             "SHR" => 0b1100, // 12
             "INT" => 0b1101, // 13

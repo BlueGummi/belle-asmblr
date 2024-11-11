@@ -1,17 +1,17 @@
 mod config;
-mod encode;
-mod lex;
-mod tokens;
-mod verify;
 use config::*;
+mod encode;
 use encode::*;
+mod lex;
 use lex::*;
+mod tokens;
+use tokens::*;
+mod verify;
+use verify::*;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::Path;
-use tokens::*;
-use verify::*;
-
+use colored::*;
 fn main() -> io::Result<()> {
     let config = declare_config();
     let mut lines: Vec<String> = Vec::new();
@@ -21,11 +21,11 @@ fn main() -> io::Result<()> {
         for line in io::BufReader::new(file).lines() {
             match line {
                 Ok(content) => lines.push(content),
-                Err(e) => eprintln!("Error reading line from file: {}", e),
+                Err(e) => eprintln!("{} reading line from file: {}", "Error".red().bold(), e.to_string().green()),
             }
         }
     } else {
-        println!("No input file specified, defaulting to default ASM code.");
+        println!("{}", "No input file specified, defaulting to default ASM code.".yellow());
         lines.push("mov %r0, #63".to_string());
         lines.push("add %r2, %r3 ; blah blah".to_string());
         lines.push("beq #43".to_string());
@@ -38,9 +38,9 @@ fn main() -> io::Result<()> {
     lines.retain(|line| !line.starts_with(';'));
 
     if config.verbose {
-        println!("Processing lines:");
+        println!("{}", "Processing lines:".blue());
         for line in &lines {
-            println!("{}", line);
+            println!("{}", line.green());
         }
     }
 
@@ -65,17 +65,17 @@ fn main() -> io::Result<()> {
                 println!("Instruction: {:016b}", encoded_instruction);
             }
         } else {
-            println!("Not enough tokens to encode instruction for line: {}", line);
+            println!("{} to encode instruction for line: {}", "Not enough tokens".red().bold(), line.to_string().green());
         }
         if config.verbose {
             for token in tokens {
-                println!("{}", token);
+                println!("{}", token.to_string().blue().bold());
             }
         }
         line_count += 1;
     }
     if has_err {
-        eprintln!("Exiting...");
+        eprintln!("{}", "Exiting...".red());
         std::process::exit(1);
     }
     print_subroutine_map();
