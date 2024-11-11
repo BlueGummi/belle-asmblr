@@ -33,8 +33,7 @@ impl Token {
 }
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let config = declare_config();
-        if config.verbose {
+        if CONFIG.verbose {
             match self {
                 Token::Ident(s) => write!(f, "ident(\"{}\") length: [{}]", s, s.len()),
                 Token::Register(n) => write!(f, "register({})", n),

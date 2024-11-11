@@ -4,9 +4,13 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 pub fn register_to_binary(reg: Option<&Token>) -> i16 {
-    let config = declare_config();
     match reg {
-        Some(Token::Register(num)) => *num,
+        Some(Token::Register(num)) => {
+            if *num > 8 {
+                eprintln!("{}", "Register value cannot be greater than 7".bold().red());
+            }
+            *num
+        }
         Some(Token::Literal(literal)) => (1 << 7) | *literal,
         Some(Token::SR(sr)) | Some(Token::SRCall(sr)) => {
             let map = SUBROUTINE_MAP.lock().unwrap();
@@ -17,7 +21,7 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
                 let mut subroutine_counter = 1;
                 let mut subroutine_map = HashMap::new();
 
-                let file_result = File::open(Path::new(&config.file.unwrap()));
+                let file_result = File::open(Path::new(CONFIG.file.as_ref().unwrap()));
                 if file_result.is_err() {
                     println!("File not found");
                     std::process::exit(1);
@@ -33,6 +37,9 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
                         subroutine_map.insert(subroutine_name, subroutine_counter);
                         subroutine_counter += 1;
                     }
+                }
+                if !subroutine_map.contains_key(sr) {
+                    eprintln!("Subroutine \"{}\" does not exist.", sr);
                 }
 
                 return *subroutine_map.get(sr).unwrap_or(&0);
@@ -53,7 +60,6 @@ pub fn write_encoded_instructions_to_file(
     Ok(())
 }
 pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token>) -> i16 {
-    let config = declare_config();
     let mut subr: bool = false;
     let mut is_call: bool = false;
     let instruction_bin = match ins {
@@ -63,7 +69,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             "AND" => 0b0010, // 2
             "OR" => 0b0011,  // 3
             "CALL" => {
-                if config.debug {
+                if CONFIG.debug {
                     println!("this is a call!");
                 }
                 is_call = true;
@@ -88,7 +94,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
         _ => {
             if let Token::SR(_) = ins {
                 subr = true;
-                if config.debug {
+                if CONFIG.debug {
                     println!("Subroutine detected");
                 }
                 0b1111

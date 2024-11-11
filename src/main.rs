@@ -7,25 +7,34 @@ use lex::*;
 mod tokens;
 use tokens::*;
 mod verify;
-use verify::*;
+use colored::*;
 use std::fs::File;
 use std::io::{self, BufRead, Write};
 use std::path::Path;
-use colored::*;
+use verify::*;
+use once_cell::sync::Lazy;
+
+static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 fn main() -> io::Result<()> {
-    let config = declare_config();
     let mut lines: Vec<String> = Vec::new();
     let mut has_err: bool = false;
-    if config.file.is_some() {
-        let file = File::open(Path::new(&config.file.unwrap()))?;
+    if CONFIG.file.is_some() {
+        let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
         for line in io::BufReader::new(file).lines() {
             match line {
                 Ok(content) => lines.push(content),
-                Err(e) => eprintln!("{} reading line from file: {}", "Error".red().bold(), e.to_string().green()),
+                Err(e) => eprintln!(
+                    "{} reading line from file: {}",
+                    "Error".red().bold(),
+                    e.to_string().green()
+                ),
             }
         }
     } else {
-        println!("{}", "No input file specified, defaulting to default ASM code.".yellow());
+        println!(
+            "{}",
+            "No input file specified, defaulting to default ASM code.".yellow()
+        );
         lines.push("mov %r0, #63".to_string());
         lines.push("add %r2, %r3 ; blah blah".to_string());
         lines.push("beq #43".to_string());
@@ -37,7 +46,7 @@ fn main() -> io::Result<()> {
     }
     lines.retain(|line| !line.starts_with(';'));
 
-    if config.verbose {
+    if CONFIG.verbose {
         println!("{}", "Processing lines:".blue());
         for line in &lines {
             println!("{}", line.green());
@@ -61,13 +70,17 @@ fn main() -> io::Result<()> {
                 has_err = true;
             }
             encoded_instructions.extend(&encoded_instruction.to_be_bytes());
-            if config.verbose {
+            if CONFIG.verbose {
                 println!("Instruction: {:016b}", encoded_instruction);
             }
         } else {
-            println!("{} to encode instruction for line: {}", "Not enough tokens".red().bold(), line.to_string().green());
+            println!(
+                "{} to encode instruction for line: {}",
+                "Not enough tokens".red().bold(),
+                line.to_string().green()
+            );
         }
-        if config.verbose {
+        if CONFIG.verbose {
             for token in tokens {
                 println!("{}", token.to_string().blue().bold());
             }
@@ -80,7 +93,7 @@ fn main() -> io::Result<()> {
     }
     print_subroutine_map();
 
-    if let Some(output_file) = &config.output {
+    if let Some(output_file) = &CONFIG.output {
         if write_to_file {
             write_encoded_instructions_to_file(output_file, &encoded_instructions)?;
         }

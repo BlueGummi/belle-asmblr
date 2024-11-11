@@ -8,10 +8,9 @@ pub static SUBROUTINE_MAP: Lazy<Mutex<HashMap<String, u32>>> =
 static SUBROUTINE_COUNTER: Lazy<Mutex<u32>> = Lazy::new(|| Mutex::new(1));
 
 pub fn print_subroutine_map() {
-    let config = declare_config();
     let map = SUBROUTINE_MAP.lock().unwrap();
     for (name, counter) in map.iter() {
-        if config.verbose {
+        if CONFIG.verbose {
             println!("Subroutine: {}, Counter: {}", name, counter);
         }
     }
