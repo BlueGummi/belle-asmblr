@@ -22,7 +22,8 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-                "CALL" | "JMP" | "SHL" | "SHR" | "INT" => {
+
+                "CALL" | "JMP" | "INT" => {
                     if CONFIG.debug {
                         println!("arg1 {:?}, arg2 {:?}", arg1, arg2);
                     }
