@@ -151,7 +151,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     let positive_value = num_value.abs() as u8; // convert to positive
                     (positive_value & 0x7F) | 0x80 // set the sign bit (flip first bit)
                 } else {
-                    num_value as i16
+                    num_value as u8
                 };
 
                 tokens.push(Token::Literal(stored_value as i16));
