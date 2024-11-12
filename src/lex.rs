@@ -189,15 +189,15 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 tokens.push(Token::MemAddr(addr_val));
             }
             '.' => {
-                let mut kw = String::new();
+                let mut label = String::new();
                 while let Some(&next) = chars.peek() {
                     if next.is_alphanumeric() || next == '_' {
-                        kw.push(chars.next().unwrap());
+                        label.push(chars.next().unwrap());
                     } else {
                         break;
                     }
                 }
-                tokens.push(Token::KW(kw));
+                tokens.push(Token::Label(label));
             }
             _ => {
                 eprintln!("Unknown character: {}: line {}", c, line_number);

@@ -14,7 +14,7 @@ pub enum Token {
     SRCall(String),
     SR(String),
     MemAddr(i16),
-    KW(String),
+    Label(String),
 }
 impl Token {
     pub fn get_raw(&self) -> String {
@@ -30,7 +30,7 @@ impl Token {
             Token::SRCall(s) => s.to_string(),
             Token::SR(s) => s.to_string(),
             Token::MemAddr(n) => n.to_string(),
-            Token::KW(s) => s.to_string(),
+            Token::Label(s) => s.to_string(),
         }
     }
 }
@@ -49,7 +49,7 @@ impl fmt::Display for Token {
                 Token::SRCall(s) => write!(f, "SRCall({})", s),
                 Token::SR(s) => write!(f, "Subroutine({})", s),
                 Token::MemAddr(n) => write!(f, "MemAddr({})", n),
-                Token::KW(s) => write!(f, "Keyword({})", s),
+                Token::Label(s) => write!(f, "Keyword({})", s),
             }
         } else {
             Ok(())

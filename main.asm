@@ -1,4 +1,4 @@
-.heap_end $500
+.start $500
 ;add %r3, %r2 ; comment
 ;and %r7, %r2 ; comment
 ;add %r4, #127
