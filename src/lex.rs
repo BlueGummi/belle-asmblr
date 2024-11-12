@@ -137,7 +137,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     }
                 };
 
-                if num_value > 128 || num_value < -128 {
+                if !(-128..=128).contains(&num_value) {
                     eprintln!(
                         "Numeric literal cannot be over +/- 128: line {}",
                         line_number
@@ -148,7 +148,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 // if it is less than 0, bitflip first bit
                 let stored_value = if num_value < 0 {
                     // first positive value as sign bit
-                    let positive_value = num_value.abs() as u8; // convert to positive
+                    let positive_value = num_value.unsigned_abs() as u8; // convert to positive
                     (positive_value & 0x7F) | 0x80 // set the sign bit (flip first bit)
                 } else {
                     num_value as u8
