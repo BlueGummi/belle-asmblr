@@ -6,7 +6,6 @@ pub enum Token {
     Ident(String),
     Register(i16),
     Comma,
-    AndSign,
     Literal(i16),
     NewLine,
     Semicolon,
@@ -15,6 +14,8 @@ pub enum Token {
     SR(String),
     MemAddr(i16),
     Label(String),
+    RegPointer(i16),
+    MemPointer(i16),
 }
 impl Token {
     pub fn get_raw(&self) -> String {
@@ -22,7 +23,6 @@ impl Token {
             Token::Ident(s) => s.to_string(),
             Token::Register(n) => n.to_string(),
             Token::Comma => "comma".to_string(),
-            Token::AndSign => "and_sign".to_string(),
             Token::Literal(n) => n.to_string(),
             Token::NewLine => "newline".to_string(),
             Token::Eol => "eol".to_string(),
@@ -31,6 +31,8 @@ impl Token {
             Token::SR(s) => s.to_string(),
             Token::MemAddr(n) => n.to_string(),
             Token::Label(s) => s.to_string(),
+            Token::RegPointer(n) => n.to_string(),
+            Token::MemPointer(n) => n.to_string(),
         }
     }
 }
@@ -41,7 +43,6 @@ impl fmt::Display for Token {
                 Token::Ident(s) => write!(f, "ident(\"{}\") length: [{}]", s, s.len()),
                 Token::Register(n) => write!(f, "register({})", n),
                 Token::Comma => write!(f, "comma"),
-                Token::AndSign => write!(f, "and_sign"),
                 Token::Literal(n) => write!(f, "number_literal({})", n),
                 Token::NewLine => write!(f, "new_line"),
                 Token::Eol => writeln!(f, "eol"),
@@ -50,6 +51,8 @@ impl fmt::Display for Token {
                 Token::SR(s) => write!(f, "Subroutine({})", s),
                 Token::MemAddr(n) => write!(f, "MemAddr({})", n),
                 Token::Label(s) => write!(f, "Keyword({})", s),
+                Token::RegPointer(n) => write!(f, "Pointer({})", n),
+                Token::MemPointer(n) => write!(f, "Pointer({})", n),
             }
         } else {
             Ok(())

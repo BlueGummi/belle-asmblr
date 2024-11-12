@@ -29,7 +29,61 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 tokens.push(Token::Semicolon);
                 break;
             }
-            '&' => tokens.push(Token::AndSign),
+            '&' => {
+                let mut pointer = String::new();
+                pointer.push(c);
+                let mut is_reg: bool = true;
+                if let Some(&next) = chars.peek() {
+                    match next {
+                        'r' | 'R' => {
+                            pointer.push(chars.next().unwrap());
+                        }
+                        '$' => {
+                            pointer.push(chars.next().unwrap());
+                            is_reg = false;
+                        }
+                        _ => {
+                            eprintln!("Expected 'r', 'R', or '$' after '&': line {}", line_number);
+                            std::process::exit(1);
+                        }
+                    }
+                }
+                while let Some(&next) = chars.peek() {
+                    // read after reg/mem
+                    if next.is_ascii_digit() {
+                        pointer.push(chars.next().unwrap());
+                    } else {
+                        break;
+                    }
+                }
+                if is_reg {
+                    if pointer.len() > 2 {
+                        if let Ok(reg) = pointer.trim()[2..].parse::<i16>() {
+                            tokens.push(Token::RegPointer(reg));
+                        } else {
+                            eprintln!("Invalid register number: line {}", line_number);
+                            break;
+                        }
+                    } else {
+                        eprintln!("Register must have a number: line {}", line_number);
+                        break;
+                    }
+                }
+                if !is_reg {
+                    if pointer.len() > 2 {
+                        if let Ok(mem) = pointer.trim()[2..].parse::<i16>() {
+                            tokens.push(Token::MemPointer(mem));
+                        } else {
+                            eprintln!("Invalid memory number: line {}", line_number);
+                            break;
+                        }
+                    } else {
+                        eprintln!("Memory must have a number: line {}", line_number);
+                        break;
+                    }
+                }
+            }
+
             '%' => {
                 let mut reg = String::new();
                 reg.push(c);

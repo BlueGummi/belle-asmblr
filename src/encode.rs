@@ -74,7 +74,7 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
                     std::process::exit(1);
                 }
             };
-            label_val 
+            label_val
         }
         _ => 0,
     }
@@ -187,9 +187,9 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                                                                    // encoding as subr but reg1
     }
     if is_label {
-
-        return (instruction_bin << 12) | (register_to_binary(Some(ins)) << 9) | register_to_binary(reg1);
-    
+        return (instruction_bin << 12)
+            | (register_to_binary(Some(ins)) << 9)
+            | register_to_binary(reg1);
     }
     if is_st {
         return (instruction_bin << 12)
