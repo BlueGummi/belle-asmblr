@@ -66,6 +66,21 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
             }
         }
         Some(Token::MemAddr(n)) => *n,
+        Some(Token::KW(keyword)) => {
+            let kw_val: i16 = match keyword.as_str() {
+                "start" => 1,
+                "end" => 2,
+                "stack_start" => 3,
+                "stack_end" => 4,
+                "heap_start" => 5,
+                "heap_end" => 6,
+                _ => {
+                    println!("Keyword not recognized after '.' ");
+                    std::process::exit(1);
+                }
+            };
+            kw_val 
+        }
         _ => 0,
     }
 }
@@ -106,6 +121,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
 
     let mut subr: bool = false;
     let mut is_st: bool = false;
+    let mut is_kw: bool = false;
     let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
         Token::Ident(ref instruction) => match instruction.to_uppercase().as_str() {
@@ -150,17 +166,21 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 std::process::exit(1);
             }
         },
-        _ => {
-            if let Token::SR(_) = ins {
-                subr = true;
-                if CONFIG.debug {
-                    println!("Subroutine detected");
-                }
-                SR_OP
-            } else {
-                HLT_OP
+        Token::SR(_) => {
+            subr = true;
+            if CONFIG.debug {
+                println!("Subroutine detected");
             }
+            SR_OP
         }
+        Token::KW(_) => {
+            is_kw = true;
+            if CONFIG.debug {
+                println!("Keyword detected");
+            }
+            HLT_OP
+        }
+        _ => HLT_OP,
     };
     if subr {
         return (instruction_bin << 12) | register_to_binary(Some(ins)); // subroutines push ins to
@@ -170,6 +190,11 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     if is_one_arg {
         return (instruction_bin << 12) | register_to_binary(reg1); // one arg opcodes, same
                                                                    // encoding as subr but reg1
+    }
+    if is_kw {
+
+        return (instruction_bin << 12) | (register_to_binary(Some(ins)) << 9) | register_to_binary(reg1);
+    
     }
     if is_st {
         return (instruction_bin << 12)
