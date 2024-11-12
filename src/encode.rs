@@ -94,8 +94,8 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 JZ_OP // 9
             }
             "CMP" => CMP_OP, // 10
-            "SHL" => SHL_OP, // 11
-            "SHR" => SHR_OP, // 12
+            "MUL" => MUL_OP, // 11
+            "NOP" => NOP_OP, // 12
             "INT" => {
                 is_one_arg = true;
                 INT_OP // 13

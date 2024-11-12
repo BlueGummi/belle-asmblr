@@ -1,7 +1,7 @@
 use crate::*;
 pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num: u32) -> bool {
     let instructions = [
-        "HLT", "ADD", "AND", "OR", "CALL", "RET", "LD", "ST", "JMP", "JZ", "MUL", "SHL", "SHR",
+        "HLT", "ADD", "AND", "OR", "CALL", "RET", "LD", "ST", "JMP", "JZ", "MUL", "CMP", "NOP",
         "INT", "MOV",
     ];
     let raw_token = ins.get_raw().to_uppercase();
@@ -10,7 +10,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
     if let Token::Ident(_) = ins {
         if instructions.contains(&raw_token.as_str()) {
             match raw_token.as_str() {
-                "HLT" | "RET" => {
+                "HLT" | "RET" | "NOP" => {
                     if is_arg(arg1) | is_arg(arg2) {
                         err_msg = format!("{} does not take any arguments", raw_token);
                         has_error = true;
@@ -22,7 +22,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-                "SHL" | "SHR" | "INT" => {
+                "INT" => {
                     let args_satisfied =
                         (is_arg(arg1) && is_arg(arg2)) | (is_arg(arg1) && !is_arg(arg2));
                     if !args_satisfied {
