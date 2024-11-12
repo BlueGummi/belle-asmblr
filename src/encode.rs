@@ -76,6 +76,9 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
             };
             label_val
         }
+        Some(Token::MemPointer(mem)) => (0 << 8) | (1 << 7) | mem,
+        Some(Token::RegPointer(reg)) => (0 << 8) | (1 << 6) | reg,
+        
         _ => 0,
     }
 }
