@@ -47,15 +47,18 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     );
                     break;
                 }
-                while let Some(&next) = chars.peek() { // read after 'r'
+                while let Some(&next) = chars.peek() {
+                    // read after 'r'
                     if next.is_ascii_digit() {
                         reg.push(chars.next().unwrap()); // push to str
                     } else {
                         break;
                     }
                 }
-                if reg.len() > 2 { // make sure it long enough
-                    if let Ok(reg_num) = reg.trim()[2..].parse::<i16>() { // parse the # 
+                if reg.len() > 2 {
+                    // make sure it long enough
+                    if let Ok(reg_num) = reg.trim()[2..].parse::<i16>() {
+                        // parse the #
                         tokens.push(Token::Register(reg_num));
                     } else {
                         eprintln!("Invalid register number: line {}", line_number);
@@ -68,8 +71,10 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
             }
             '@' => {
                 let mut subroutine_call = String::new(); // make a string
-                while let Some(&next) = chars.peek() { // iterator again
-                    if next.is_alphanumeric() || next == '_' { // yay sub_rou_tines
+                while let Some(&next) = chars.peek() {
+                    // iterator again
+                    if next.is_alphanumeric() || next == '_' {
+                        // yay sub_rou_tines
                         subroutine_call.push(chars.next().unwrap()); // push it to a string
                     } else {
                         break;
@@ -79,7 +84,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
             }
             'a'..='z' | 'A'..='Z' => {
                 let mut ident = String::new();
-                ident.push(c); // push first digit
+                ident.push(c); // push first letter
                 while let Some(&next) = chars.peek() {
                     if next.is_alphanumeric() || next == '_' {
                         ident.push(chars.next().unwrap()); // keep adding on
@@ -88,7 +93,8 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     }
                 }
                 if let Some(&next) = chars.peek() {
-                    if next == ':' { // subroutines
+                    if next == ':' {
+                        // subroutines
                         chars.next(); // get the next thing
                         let mut map = SUBROUTINE_MAP.lock().unwrap();
                         if !map.contains_key(&ident) {
@@ -125,7 +131,8 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     }
                 } // keep going and going
 
-                let num_value = match number[1..].parse::<i16>() { // parse second digit to end
+                let num_value = match number[1..].parse::<i16>() {
+                    // parse second digit to end
                     Ok(value) => value,
                     Err(_) => {
                         eprintln!(
@@ -153,7 +160,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                                                    // hex because lazy
                 } else {
                     num_value as u8
-                }; // all good 
+                }; // all good
 
                 tokens.push(Token::Literal(stored_value as i16));
             }
@@ -166,19 +173,31 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                         break;
                     } // add it all to addr string
                 }
-                if addr[1..].parse::<i16>().is_err() { // try to get an address
+                if addr[1..].parse::<i16>().is_err() {
+                    // try to get an address
                     eprintln!(
-                        "Value after $ must be numeric, 0-4,096: line {}", // TODO
+                        "Value after $ must be numeric, 512: line {}", // TODO
                         line_number
                     );
                     std::process::exit(1);
                 }
                 let addr_val = addr[1..].parse::<i16>().unwrap();
-                if addr_val >= 4096 || addr_val <= 0 {
-                    eprintln!("Address must be between 0-4,096: line {}", line_number); // TODO
+                if addr_val >= 512 || addr_val <= 0 {
+                    eprintln!("Address must be between 0-512: line {}", line_number); // TODO
                     std::process::exit(1);
                 }
                 tokens.push(Token::MemAddr(addr_val));
+            }
+            '.' => {
+                let mut kw = String::new();
+                while let Some(&next) = chars.peek() {
+                    if next.is_alphanumeric() || next == '_' {
+                        kw.push(chars.next().unwrap());
+                    } else {
+                        break;
+                    }
+                }
+                tokens.push(Token::KW(kw));
             }
             _ => {
                 eprintln!("Unknown character: {}: line {}", c, line_number);

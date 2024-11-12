@@ -53,7 +53,7 @@ fn main() -> io::Result<()> {
         *line = line.trim().to_string();
     }
     lines.retain(|line| !line.starts_with(';')); // retain non-empty lines that don't start with ;
-    if CONFIG.verbose  || CONFIG.debug {
+    if CONFIG.verbose || CONFIG.debug {
         println!("{}", "Processing lines:".blue());
         for line in &lines {
             println!("{}", line.green());
