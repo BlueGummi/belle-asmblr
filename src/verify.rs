@@ -61,7 +61,12 @@ fn is_arg(tok_to_check: Option<&Token>) -> bool {
     if tok_to_check.is_some() {
         return matches!(
             tok_to_check.unwrap(),
-            Token::Register(_) | Token::Literal(_) | Token::SRCall(_) | Token::MemAddr(_) | Token::MemPointer(_) | Token::RegPointer(_)
+            Token::Register(_)
+                | Token::Literal(_)
+                | Token::SRCall(_)
+                | Token::MemAddr(_)
+                | Token::MemPointer(_)
+                | Token::RegPointer(_)
         );
     }
     false
