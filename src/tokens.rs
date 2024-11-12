@@ -1,6 +1,7 @@
 use crate::*;
 use std::fmt;
 #[derive(Debug)]
+// self explanatory, you got this
 pub enum Token {
     Ident(String),
     Register(i16),

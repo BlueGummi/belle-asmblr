@@ -3,13 +3,14 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
     let instructions = [
         "HLT", "ADD", "AND", "OR", "CALL", "RET", "LD", "ST", "JMP", "JZ", "MUL", "CMP", "NOP",
         "INT", "MOV",
-    ];
-    let raw_token = ins.get_raw().to_uppercase();
-    let mut has_error: bool = false;
+    ]; // I can't think of a better way to do this
+    let raw_token = ins.get_raw().to_uppercase(); // has to be uppercase
+    let mut has_error: bool = false; // this is a weird way to handle errors
     let mut err_msg: String = String::from("");
     if let Token::Ident(_) = ins {
         if instructions.contains(&raw_token.as_str()) {
             match raw_token.as_str() {
+                // boolean bonanza
                 "HLT" | "RET" | "NOP" => {
                     if is_arg(arg1) | is_arg(arg2) {
                         err_msg = format!("{} does not take any arguments", raw_token);
@@ -52,7 +53,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
     }
     has_error
 }
-
+// this is all self-explanatory, wait till you see lex.rs
 fn is_arg(tok_to_check: Option<&Token>) -> bool {
     if tok_to_check.is_none() {
         return false;

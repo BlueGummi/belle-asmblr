@@ -2,7 +2,7 @@ use crate::*;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::sync::Mutex;
-
+// really goofy
 pub static SUBROUTINE_MAP: Lazy<Mutex<HashMap<String, u32>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 static SUBROUTINE_COUNTER: Lazy<Mutex<u32>> = Lazy::new(|| Mutex::new(1));
@@ -18,7 +18,7 @@ pub fn print_subroutine_map() {
 
 pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
     let mut tokens = Vec::new();
-    let mut chars = line.chars().peekable();
+    let mut chars = line.chars().peekable(); // iterator
 
     while let Some(c) = chars.next() {
         match c {
@@ -35,7 +35,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 reg.push(c);
                 if let Some(&next) = chars.peek() {
                     if next == 'r' || next == 'R' {
-                        reg.push(chars.next().unwrap());
+                        reg.push(chars.next().unwrap()); // keep going
                     } else {
                         eprintln!("Expected 'r' or 'R' after '%': line {}", line_number);
                         break;
@@ -47,15 +47,15 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     );
                     break;
                 }
-                while let Some(&next) = chars.peek() {
+                while let Some(&next) = chars.peek() { // read after 'r'
                     if next.is_ascii_digit() {
-                        reg.push(chars.next().unwrap());
+                        reg.push(chars.next().unwrap()); // push to str
                     } else {
                         break;
                     }
                 }
-                if reg.len() > 2 {
-                    if let Ok(reg_num) = reg.trim()[2..].parse::<i16>() {
+                if reg.len() > 2 { // make sure it long enough
+                    if let Ok(reg_num) = reg.trim()[2..].parse::<i16>() { // parse the # 
                         tokens.push(Token::Register(reg_num));
                     } else {
                         eprintln!("Invalid register number: line {}", line_number);
@@ -67,35 +67,35 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                 }
             }
             '@' => {
-                let mut subroutine_call = String::new();
-                while let Some(&next) = chars.peek() {
-                    if next.is_alphanumeric() || next == '_' {
-                        subroutine_call.push(chars.next().unwrap());
+                let mut subroutine_call = String::new(); // make a string
+                while let Some(&next) = chars.peek() { // iterator again
+                    if next.is_alphanumeric() || next == '_' { // yay sub_rou_tines
+                        subroutine_call.push(chars.next().unwrap()); // push it to a string
                     } else {
                         break;
                     }
-                }
+                } // check again and again and then push it
                 tokens.push(Token::SRCall(subroutine_call));
             }
             'a'..='z' | 'A'..='Z' => {
                 let mut ident = String::new();
-                ident.push(c);
+                ident.push(c); // push first digit
                 while let Some(&next) = chars.peek() {
                     if next.is_alphanumeric() || next == '_' {
-                        ident.push(chars.next().unwrap());
+                        ident.push(chars.next().unwrap()); // keep adding on
                     } else {
                         break;
                     }
                 }
                 if let Some(&next) = chars.peek() {
-                    if next == ':' {
-                        chars.next();
+                    if next == ':' { // subroutines
+                        chars.next(); // get the next thing
                         let mut map = SUBROUTINE_MAP.lock().unwrap();
                         if !map.contains_key(&ident) {
                             let mut counter = SUBROUTINE_COUNTER.lock().unwrap();
-                            map.insert((*ident).to_string(), *counter);
+                            map.insert((*ident).to_string(), *counter); // get that ident
                             *counter += 1;
-                            tokens.push(Token::SR(ident));
+                            tokens.push(Token::SR(ident)); // add the ident
                         } else {
                             eprintln!(
                                 "Duplicate subroutine declaration: '{}': line {}",
@@ -103,7 +103,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                             );
                         }
                     } else {
-                        tokens.push(Token::Ident(ident));
+                        tokens.push(Token::Ident(ident)); // just push the ident
                     }
                 } else {
                     tokens.push(Token::Ident(ident));
@@ -115,7 +115,7 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     if next == '-' {
                         number.push(chars.next().unwrap());
                     }
-                }
+                } // negative numbers (runs once)
 
                 while let Some(&next) = chars.peek() {
                     if next.is_ascii_digit() {
@@ -123,9 +123,9 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     } else {
                         break;
                     }
-                }
+                } // keep going and going
 
-                let num_value = match number[1..].parse::<i16>() {
+                let num_value = match number[1..].parse::<i16>() { // parse second digit to end
                     Ok(value) => value,
                     Err(_) => {
                         eprintln!(
@@ -150,9 +150,10 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                     // first positive value as sign bit
                     let positive_value = num_value.unsigned_abs() as u8; // convert to positive
                     (positive_value & 0x7F) | 0x80 // set the sign bit (flip first bit)
+                                                   // hex because lazy
                 } else {
                     num_value as u8
-                };
+                }; // all good 
 
                 tokens.push(Token::Literal(stored_value as i16));
             }
@@ -163,18 +164,18 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
                         addr.push(chars.next().unwrap());
                     } else {
                         break;
-                    }
+                    } // add it all to addr string
                 }
-                if addr[1..].parse::<i16>().is_err() {
+                if addr[1..].parse::<i16>().is_err() { // try to get an address
                     eprintln!(
-                        "Value after $ must be numeric, 0-4,096: line {}",
+                        "Value after $ must be numeric, 0-4,096: line {}", // TODO
                         line_number
                     );
                     std::process::exit(1);
                 }
                 let addr_val = addr[1..].parse::<i16>().unwrap();
                 if addr_val >= 4096 || addr_val <= 0 {
-                    eprintln!("Address must be between 0-4,096: line {}", line_number);
+                    eprintln!("Address must be between 0-4,096: line {}", line_number); // TODO
                     std::process::exit(1);
                 }
                 tokens.push(Token::MemAddr(addr_val));
@@ -185,6 +186,6 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
         }
     }
 
-    tokens.push(Token::Eol);
+    tokens.push(Token::Eol); // finally push eol at end of line
     tokens
 }

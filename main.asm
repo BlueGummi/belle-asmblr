@@ -1,6 +1,6 @@
 add %r3, %r2 ; comment
 and %r7, %r2 ; comment
-add "%r4", #127
+add %r4, #127
 or %r3, %r5
 ld %r2, $500
 st $500, %r2
@@ -10,7 +10,6 @@ int #2
 mov %r4, #40
 hlt
 ret
-call @function
 cmp %r3, %r2
 
 
@@ -31,6 +30,3 @@ fib:
 	add %r3, #1
 	call @fib
 ret
-
-
-    

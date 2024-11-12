@@ -18,9 +18,15 @@ use std::path::Path;
 
 static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 fn main() -> io::Result<()> {
-    let mut lines: Vec<String> = Vec::new();
+    if CONFIG.debug {
+        println!("Main func started.");
+    }
+    let mut lines: Vec<String> = Vec::new(); // vector to push lines onto
     let mut has_err: bool = false;
     if CONFIG.file.is_some() {
+        if CONFIG.debug {
+            println!("File is Some");
+        }
         let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
         for line in io::BufReader::new(file).lines() {
             match line {
@@ -39,15 +45,14 @@ fn main() -> io::Result<()> {
         );
         lines.push("mov %r0, #63".to_string());
         lines.push("add %r2, %r3 ; blah blah".to_string());
-        lines.push("beq #43".to_string());
+        lines.push("jmp #43".to_string());
         lines.push("add %r4, #69".to_string());
     }
     lines.retain(|line| !line.is_empty());
     for line in &mut lines {
         *line = line.trim().to_string();
     }
-    lines.retain(|line| !line.starts_with(';'));
-
+    lines.retain(|line| !line.starts_with(';')); // retain non-empty lines that don't start with ;
     if CONFIG.verbose {
         println!("{}", "Processing lines:".blue());
         for line in &lines {
@@ -56,30 +61,42 @@ fn main() -> io::Result<()> {
     }
 
     let mut encoded_instructions = Vec::new();
-    let mut line_count: u32 = 1;
-    let mut write_to_file: bool = true;
+    let mut line_count: u32 = 1; // bigger numbers with 32
+    let mut write_to_file: bool = true; // defines if we should write to file (duh)
     for line in lines {
         let tokens = lex(&line, line_count);
 
         let instruction = tokens.first();
-        let register1 = tokens.get(1);
-        let register2 = tokens.get(3);
-
+        let operand1 = tokens.get(1);
+        let operand2 = tokens.get(3); // get 2 would be a comma, it's always a comma
+        if CONFIG.debug {
+            println!("Raw line: {}", line.green());
+        }
         if let Some(ins) = instruction {
-            let encoded_instruction = encode_instruction(ins, register1, register2);
-            if verify(ins, register1, register2, line_count) {
+            let encoded_instruction = encode_instruction(ins, operand1, operand2);
+            if verify(ins, operand1, operand2, line_count) {
                 write_to_file = false;
                 has_err = true;
             }
             encoded_instructions.extend(&encoded_instruction.to_be_bytes());
             if CONFIG.verbose {
                 println!("Instruction: {:016b}", encoded_instruction);
-                let ins_str: String = format!("{:016b}", encoded_instruction);
+            }
+            let ins_str: String = format!("{:016b}", encoded_instruction);
+            if CONFIG.debug {
                 if let Some(ins) = ins_str.get(0..4) {
-                    println!("INS: {}", ins);
+                    // fixed length instructions my beloved
+                    // making this not a PITA :heart:
+                    println!("INS: {}", ins.blue().bold());
                 }
                 if let Some(dst) = ins_str.get(4..7) {
-                    println!("DST: {}", dst);
+                    println!("DST: {}", dst.blue().bold());
+                }
+                if let Some(dtb) = ins_str.get(7..8) {
+                    println!("DTB: {}", dtb.blue().bold());
+                }
+                if let Some(src) = ins_str.get(8..15) {
+                    println!("SRC: {}", src.blue().bold());
                 }
             }
         } else {
@@ -89,23 +106,30 @@ fn main() -> io::Result<()> {
                 line.to_string().green()
             );
         }
-        if CONFIG.verbose {
+        if CONFIG.debug {
             for token in tokens {
-                println!("{}", token.to_string().blue().bold());
+                println!(
+                    "{} {}",
+                    "Token:".green().bold(),
+                    token.to_string().blue().bold()
+                );
             }
         }
-        line_count += 1;
+        line_count += 1; // line count exists so we can have line number errors
     }
     if has_err {
         eprintln!("{}", "Exiting...".red());
-        std::process::exit(1);
+        std::process::exit(1); // wowzers, amazing
     }
-    print_subroutine_map();
+    if CONFIG.debug {
+        print_subroutine_map();
+    }
 
-    if let Some(output_file) = &CONFIG.output {
-        if write_to_file {
+    match &CONFIG.output {
+        Some(output_file) if write_to_file => {
             write_encoded_instructions_to_file(output_file, &encoded_instructions)?;
         }
+        _ => println!("some funny business happen on output writing :C"),
     }
 
     Ok(())

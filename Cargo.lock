@@ -52,7 +52,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "asmblr"
+name = "belle-asm"
 version = "0.1.0"
 dependencies = [
  "clap",
