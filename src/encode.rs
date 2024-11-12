@@ -142,9 +142,9 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 is_st = true;
                 ST_OP // 7
             }
-            "JMP" => {
+            "PUSH" => {
                 is_one_arg = true;
-                JMP_OP // 8
+                PUSH_OP // 8
             }
             "JZ" => {
                 is_one_arg = true;
@@ -152,7 +152,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
             "CMP" => CMP_OP, // 10
             "MUL" => MUL_OP, // 11
-            "NOP" => NOP_OP, // 12
+            "POP" => POP_OP, // 12
             "INT" => {
                 is_one_arg = true;
                 INT_OP // 13
