@@ -1,10 +1,14 @@
-.start $500
-    mov %r4, #100
-    mul %r4, #3
-    st $500, %r4
-    mov %r0, #100
-    mul %r0, #5
-    mov %r1, &r0
+push #50
+pop %r2
+
+
+;.start $500
+;   mov %r4, #100
+;    mul %r4, #3
+;   st $500, %r4
+;   mov %r0, #100
+;   mul %r0, #5
+;   mov %r1, &r0
 ;   add %r3, %r2 ; comment
 ;   and %r7, %r2 ; comment
 ;   add %r4, #127

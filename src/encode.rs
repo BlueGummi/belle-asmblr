@@ -1,8 +1,9 @@
 use crate::*;
+use colored::*;
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::{self, BufRead};
-
+use std::io::{self, BufRead, Write};
+use std::path::Path;
 pub fn register_to_binary(reg: Option<&Token>) -> i16 {
     // this is some really stupid stuff
     match reg {
@@ -76,8 +77,8 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
             };
             label_val
         }
-        Some(Token::MemPointer(mem)) => (0 << 8) | (1 << 7) | mem,
-        Some(Token::RegPointer(reg)) => (0 << 8) | (1 << 6) | reg,
+        Some(Token::MemPointer(mem)) => (1 << 7) | mem,
+        Some(Token::RegPointer(reg)) => (1 << 6) | reg,
 
         _ => 0,
     }
@@ -152,7 +153,10 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
             "CMP" => CMP_OP, // 10
             "MUL" => MUL_OP, // 11
-            "POP" => POP_OP, // 12
+            "POP" => {
+                is_one_arg = true;
+                POP_OP // 12
+            }
             "INT" => {
                 is_one_arg = true;
                 INT_OP // 13

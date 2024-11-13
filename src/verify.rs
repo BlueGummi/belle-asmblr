@@ -11,7 +11,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
         if instructions.contains(&raw_token.as_str()) {
             match raw_token.as_str() {
                 // boolean bonanza
-                "HLT" | "RET" | "POP" => {
+                "HLT" | "RET" => {
                     if is_arg(arg1) | is_arg(arg2) {
                         err_msg = format!("{} does not take any arguments", raw_token);
                         has_error = true;
@@ -31,7 +31,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-                "CALL" | "PUSH" | "JZ" => {
+                "CALL" | "PUSH" | "JZ" | "POP" => {
                     if CONFIG.debug {
                         println!("arg1 {:?}, arg2 {:?}", arg1, arg2);
                     }

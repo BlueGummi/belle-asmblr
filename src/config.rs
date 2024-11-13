@@ -1,5 +1,6 @@
 use clap::Parser;
-
+pub use once_cell::sync::Lazy;
+pub static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 /// Command line arguments
 #[derive(Parser)]
 pub struct Args {

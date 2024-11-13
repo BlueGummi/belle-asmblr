@@ -1,22 +1,8 @@
-mod config;
-use config::*;
-mod encode;
-use encode::*;
-mod lex;
-use lex::*;
-mod tokens;
-use tokens::*;
-mod verify;
-use verify::*;
-mod instructions;
+use belle_asm::*;
 use colored::*;
-use instructions::*;
-use once_cell::sync::Lazy;
 use std::fs::File;
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead};
 use std::path::Path;
-
-static CONFIG: Lazy<Args> = Lazy::new(declare_config);
 fn main() -> io::Result<()> {
     if CONFIG.debug {
         println!("Main func started.");
