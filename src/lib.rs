@@ -139,3 +139,12 @@ pub fn int_check() {
     );
     assert_eq!(result as u16, 0b1101000100000001);
 }
+#[test]
+pub fn cmp_check() {
+    let result = encode_instruction(
+        &Token::Ident("cmp".to_string()),
+        Some(&Token::Register(4)),
+        Some(&Token::MemPointer(32)),
+    );
+    assert_eq!(result as u16, 0b1010100010100000);
+}
