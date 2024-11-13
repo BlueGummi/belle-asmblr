@@ -3,7 +3,7 @@ pop %r2
 
 
 ;.start $500
-;   mov %r4, #100
+   mov %r0, #4
 ;    mul %r4, #3
 ;   st $500, %r4
 ;   mov %r0, #100
