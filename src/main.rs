@@ -120,3 +120,7 @@ fn main() -> io::Result<()> {
 
     Ok(())
 }
+#[cfg(test)]
+mod tests {
+    // no tests
+}

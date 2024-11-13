@@ -205,7 +205,5 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     }
     let register_bin1 = register_to_binary(reg1);
     let register_bin2 = register_to_binary(reg2);
-    let ffff =     (instruction_bin << 12) | (register_bin1 << 9) | register_bin2;
-    println!("{ffff}");
     (instruction_bin << 12) | (register_bin1 << 9) | register_bin2
 }

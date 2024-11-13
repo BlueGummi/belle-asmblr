@@ -1,4 +1,5 @@
-push #50
+powwow:
+    push #50
 pop %r2
 
 
