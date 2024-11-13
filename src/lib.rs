@@ -84,3 +84,22 @@ pub fn push_check() {
     );
     assert_eq!(result as u16, 0b1000000000000010);
 }
+#[test]
+pub fn ret_check() {
+    let result = encode_instruction(
+        &Token::Ident("ret".to_string()),
+        None,
+        None,
+    );
+    assert_eq!(result as u16, 0b0101000000000000);
+}
+#[test]
+pub fn call_check() {
+    let result = encode_instruction(
+        &Token::Ident("call".to_string()),
+        Some(&Token::SRCall("func".to_string())),
+        None,
+    );
+    assert_eq!(result as u16, 0b0100000000000000);
+}
+
