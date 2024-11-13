@@ -17,16 +17,18 @@ pub fn basic_checks() {
     let op1 = Some(&Token::Register(0));
     let op2 = Some(&Token::Literal(4));
     let result = encode_instruction(&ident, op1, op2);
-    assert_eq!(result.abs() as u32, 0b1111011111100);
+    assert_eq!(result.abs() as u16, 0b1111011111100);
     println!("{}", "MOV check complete!".blue());
-
     ident = Token::Ident("hlt".to_string());
     let result = encode_instruction(&ident, None, None);
     assert_eq!(result, 0);
 }
+#[test]
 pub fn sr_check() {
     let ident = Token::SR("powwow".to_string());
     let result = encode_instruction(&ident, None, None);
-    assert_eq!(result.abs() as u32, 0b1111000000000001);
+    println!("{result:b}");
+    println!("{}", 0b1111000000000001);
+    assert_eq!(result as u16, 0b1111000000000001);
 }
 
