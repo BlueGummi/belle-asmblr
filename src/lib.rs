@@ -102,4 +102,40 @@ pub fn call_check() {
     );
     assert_eq!(result as u16, 0b0100000000000000);
 }
-
+#[test]
+pub fn ld_check() {
+    let result = encode_instruction(
+        &Token::Ident("ld".to_string()),
+        Some(&Token::Register(5)),
+        Some(&Token::Literal(1)),
+    );
+    assert_eq!(result as u16, 0b0110101100000001);
+}
+#[test]
+pub fn st_check() {
+    let result = encode_instruction(
+        &Token::Ident("st".to_string()),
+        Some(&Token::MemAddr(1)),
+        Some(&Token::Register(4)),
+    );
+    assert_eq!(result as u16, 0b0111000000001100);
+                               //           ^ 1 over here
+}
+#[test]
+pub fn jz_check() {
+    let result = encode_instruction(
+        &Token::Ident("jz".to_string()),
+        Some(&Token::MemAddr(8)),
+        None,
+    );
+    assert_eq!(result as u16, 0b1001000000001000);
+}
+#[test]
+pub fn int_check() {
+    let result = encode_instruction(
+        &Token::Ident("int".to_string()),
+        Some(&Token::Literal(1)),
+        None,
+    );
+    assert_eq!(result as u16, 0b1101000100000001);
+}
