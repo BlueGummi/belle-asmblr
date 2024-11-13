@@ -53,7 +53,34 @@ pub fn or_check() {
     let result = encode_instruction(
         &Token::Ident("or".to_string()),
         Some(&Token::Register(2)),
-        Some(&Token::Literal(7)),
+        Some(&Token::MemPointer(7)),
     );
-    assert_eq!(result as u16, 0b0011010100000111);
+    assert_eq!(result as u16, 0b0011010010000111);
+}
+#[test]
+pub fn mul_check() {
+    let result = encode_instruction(
+        &Token::Ident("mul".to_string()),
+        Some(&Token::Register(0)),
+        Some(&Token::RegPointer(7)),
+    );
+    assert_eq!(result as u16, 0b1011000001000111);
+}
+#[test]
+pub fn pop_check() {
+    let result = encode_instruction(
+        &Token::Ident("pop".to_string()),
+        Some(&Token::Register(7)),
+        None,
+    );
+    assert_eq!(result as u16, 0b1100000000000111);
+}
+#[test]
+pub fn push_check() {
+    let result = encode_instruction(
+        &Token::Ident("push".to_string()),
+        Some(&Token::Register(2)),
+        None,
+    );
+    assert_eq!(result as u16, 0b1000000000000010);
 }

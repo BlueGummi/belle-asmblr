@@ -1,6 +1,6 @@
 powwow:
     push #50
-pop %r2
+pop %r7
 
 
 ;.start $500
