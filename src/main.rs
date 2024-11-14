@@ -72,7 +72,6 @@ fn main() -> io::Result<()> {
             if CONFIG.debug {
                 if let Some(ins) = ins_str.get(0..4) {
                     // fixed length instructions my beloved
-                    // making this not a PITA :heart:
                     println!("INS: {}", ins.blue().bold());
                 }
                 if let Some(dst) = ins_str.get(4..7) {

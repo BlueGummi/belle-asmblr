@@ -122,6 +122,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     let mut subr: bool = false;
     let mut is_st: bool = false;
     let mut is_label: bool = false;
+    let mut is_big_label: bool = false;
     let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
         // first one will always be an instruction
@@ -177,8 +178,12 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
             SR_OP
         }
-        Token::Label(_) => {
+        Token::Label(l) => {
             is_label = true;
+            if l == "ascii" || l == "asciiz" || l == "byte" {
+                is_big_label = true;
+                is_label = false;
+            }
             if CONFIG.debug {
                 println!("Keyword detected");
             }
