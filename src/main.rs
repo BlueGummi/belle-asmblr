@@ -9,7 +9,7 @@ fn main() -> io::Result<()> {
     }
     let mut lines: Vec<String> = Vec::new(); // vector to push lines onto
     let mut has_err: bool = false;
-    if CONFIG.file.is_some() {
+    if CONFIG.file.is_some() && !CONFIG.file.as_ref().unwrap().is_empty() {
         if CONFIG.debug {
             println!("File is Some");
         }
@@ -27,12 +27,9 @@ fn main() -> io::Result<()> {
     } else {
         println!(
             "{}",
-            "No input file specified, defaulting to default ASM code.".yellow()
+            "No input file specified".yellow()
         );
-        lines.push("mov %r0, #63".to_string());
-        lines.push("add %r2, %r3 ; blah blah".to_string());
-        lines.push("jmp #43".to_string());
-        lines.push("add %r4, #69".to_string());
+        std::process::exit(1);
     }
     lines.retain(|line| !line.is_empty());
     for line in &mut lines {
