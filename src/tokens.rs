@@ -16,6 +16,7 @@ pub enum Token {
     Label(String),
     RegPointer(i16),
     MemPointer(i16),
+    Value(String),
 }
 impl Token {
     pub fn get_raw(&self) -> String {
@@ -33,6 +34,7 @@ impl Token {
             Token::Label(s) => s.to_string(),
             Token::RegPointer(n) => n.to_string(),
             Token::MemPointer(n) => n.to_string(),
+            Token::Value(s) => s.to_string(),
         }
     }
 }
@@ -40,19 +42,20 @@ impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if CONFIG.verbose || CONFIG.debug {
             match self {
-                Token::Ident(s) => write!(f, "ident(\"{}\") length: [{}]", s, s.len()),
-                Token::Register(n) => write!(f, "register({})", n),
-                Token::Comma => write!(f, "comma"),
-                Token::Literal(n) => write!(f, "number_literal({})", n),
-                Token::NewLine => write!(f, "new_line"),
-                Token::Eol => writeln!(f, "eol"),
-                Token::Semicolon => write!(f, "semicolon"),
+                Token::Ident(s) => write!(f, "Ident(\"{}\") Length: [{}]", s, s.len()),
+                Token::Register(n) => write!(f, "Register({})", n),
+                Token::Comma => write!(f, "Comma"),
+                Token::Literal(n) => write!(f, "Number Literal({})", n),
+                Token::NewLine => write!(f, "Newline"),
+                Token::Eol => writeln!(f, "Eol"),
+                Token::Semicolon => write!(f, "Semicolon"),
                 Token::SRCall(s) => write!(f, "SRCall({})", s),
                 Token::SR(s) => write!(f, "Subroutine({})", s),
                 Token::MemAddr(n) => write!(f, "MemAddr({})", n),
-                Token::Label(s) => write!(f, "Keyword({})", s),
-                Token::RegPointer(n) => write!(f, "Pointer({})", n),
-                Token::MemPointer(n) => write!(f, "Pointer({})", n),
+                Token::Label(s) => write!(f, "Label({})", s),
+                Token::RegPointer(n) => write!(f, "Reg Pointer({})", n),
+                Token::MemPointer(n) => write!(f, "Mem Pointer({})", n),
+                Token::Value(s) => write!(f, "Value({})", s),
             }
         } else {
             Ok(())

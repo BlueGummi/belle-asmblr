@@ -25,10 +25,7 @@ fn main() -> io::Result<()> {
             }
         }
     } else {
-        println!(
-            "{}",
-            "No input file specified".yellow()
-        );
+        println!("{}", "No input file specified".yellow());
         std::process::exit(1);
     }
     lines.retain(|line| !line.is_empty());
@@ -51,7 +48,13 @@ fn main() -> io::Result<()> {
 
         let instruction = tokens.first();
         let operand1 = tokens.get(1);
-        let operand2 = tokens.get(3); // get 2 would be a comma, it's always a comma
+        let operand2 = {
+            if let Some(Token::Comma) = tokens.get(2) {
+                tokens.get(3)
+            } else {
+                tokens.get(2)
+            }
+        };
         if CONFIG.debug {
             println!("Raw line: {}", line.green());
         }

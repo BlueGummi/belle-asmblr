@@ -1,3 +1,4 @@
+.ascii "pow pow pow"
 powwow:
     push #50
 pop %r7

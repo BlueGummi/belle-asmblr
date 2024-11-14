@@ -6,6 +6,8 @@ use std::sync::Mutex;
 pub static SUBROUTINE_MAP: Lazy<Mutex<HashMap<String, u32>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 static SUBROUTINE_COUNTER: Lazy<Mutex<u32>> = Lazy::new(|| Mutex::new(1));
+pub static DATA_SECTOR: Lazy<Mutex<HashMap<crate::Token, crate::Token>>> =
+    Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub fn print_subroutine_map() {
     let map = SUBROUTINE_MAP.lock().unwrap();
@@ -28,6 +30,21 @@ pub fn lex(line: &str, line_number: u32) -> Vec<Token> {
             ';' => {
                 tokens.push(Token::Semicolon);
                 break;
+            }
+            '\"' => {
+                let mut value = String::new();
+                while let Some(&next) = chars.peek() {
+                    if next != '\"' {
+                        value.push(chars.next().unwrap()); // keep adding on
+                    } else {
+                        break;
+                    }
+                }
+                if let Some(&next) = chars.peek() {
+                    if next == '\"' {
+                        tokens.push(Token::Value(value)); // just push the ident
+                    }
+                }
             }
             '&' => {
                 let mut pointer = String::new();

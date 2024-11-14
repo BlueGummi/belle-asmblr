@@ -19,8 +19,6 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
         }
         // all looks good
         Some(Token::Literal(literal)) => (1 << 8) | *literal,
-
-        // uh oh... what on earth...
         Some(Token::SR(sr)) | Some(Token::SRCall(sr)) => {
             // we're gonna lock the hashmap to get stuff from it
             let map = SUBROUTINE_MAP.lock().unwrap();
@@ -70,6 +68,9 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
         Some(Token::Label(keyword)) => {
             let label_val: i16 = match keyword.as_str() {
                 "start" => 1,
+                "ascii" => 2,
+                "asciiz" => 3,
+                "byte" => 4,
                 _ => {
                     println!("Keyword not recognized after '.' ");
                     std::process::exit(1);
@@ -123,6 +124,7 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     let mut is_label: bool = false;
     let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
+        // first one will always be an instruction
         Token::Ident(ref instruction) => match instruction.to_uppercase().as_str() {
             // self
             // explanatory

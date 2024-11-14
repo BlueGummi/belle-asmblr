@@ -81,11 +81,7 @@ pub fn push_check() {
 }
 #[test]
 pub fn ret_check() {
-    let result = encode_instruction(
-        &Token::Ident("ret".to_string()),
-        None,
-        None,
-    );
+    let result = encode_instruction(&Token::Ident("ret".to_string()), None, None);
     assert_eq!(result as u16, 0b0101000000000000);
 }
 #[test]
@@ -105,7 +101,7 @@ pub fn st_check() {
         Some(&Token::Register(4)),
     );
     assert_eq!(result as u16, 0b0111000000001100);
-                               //           ^ 1 over here
+    //           ^ 1 over here
 }
 #[test]
 pub fn jz_check() {
