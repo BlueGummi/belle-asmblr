@@ -1,45 +1,89 @@
 use belle_asm::*;
 use colored::*;
+use regex::Regex;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+
 fn main() -> io::Result<()> {
     if CONFIG.debug {
         println!("Main func started.");
     }
-    let mut lines: Vec<String> = Vec::new(); // vector to push lines onto
+    let mut lines: Vec<String> = Vec::new();
     let mut has_err: bool = false;
+
     if CONFIG.file.is_some() && !CONFIG.file.as_ref().unwrap().is_empty() {
         if CONFIG.debug {
             println!("File is Some");
         }
-        let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
-        for line in io::BufReader::new(file).lines() {
+        let file = File::open(&Path::new(CONFIG.file.as_ref().unwrap()))?;
+        let reader = io::BufReader::new(file);
+        let include_regex = Regex::new(r#"^\s*#include\s+"([^"]+)""#).unwrap();
+        for line in reader.lines() {
+            match line {
+                Ok(content) => {
+                    let trimmed_content = content.trim();
+                    if trimmed_content.starts_with("#include") {
+                        if let Some(captures) = include_regex.captures(trimmed_content) {
+                            let include_file = captures[1].to_string();
+                            if let Ok(included_lines) = read_include_file(&include_file) {
+                                lines.extend(included_lines);
+                            } else {
+                                eprintln!(
+                                    "{} could not read include file: {}",
+                                    "Error".red().bold(),
+                                    include_file.green()
+                                );
+                                has_err = true;
+                            }
+                        }
+                    } else {
+                        lines.push(content);
+                        break;
+                    }
+                }
+                Err(e) => {
+                    eprintln!(
+                        "{} reading line from file: {}",
+                        "Error".red().bold(),
+                        e.to_string().green()
+                    );
+                    has_err = true;
+                }
+            }
+        }
+        let file = File::open(&Path::new(CONFIG.file.as_ref().unwrap()))?;
+        let reader = io::BufReader::new(file);
+        for line in reader.lines() {
             match line {
                 Ok(content) => lines.push(content),
-                Err(e) => eprintln!(
-                    "{} reading line from file: {}",
-                    "Error".red().bold(),
-                    e.to_string().green()
-                ),
+                Err(e) => {
+                    eprintln!(
+                        "{} reading line from file: {}",
+                        "Error".red().bold(),
+                        e.to_string().green()
+                    );
+                    has_err = true;
+                }
             }
         }
     } else {
         println!("{}", "No input file specified".yellow());
         std::process::exit(1);
     }
+
     lines.retain(|line| !line.is_empty());
     for line in &mut lines {
         *line = line.trim().to_string();
     }
-    lines.retain(|line| !line.starts_with(';')); // retain non-empty lines that don't start with ;
+    lines.retain(|line| !line.starts_with(';'));
+    lines.retain(|line| !line.starts_with('#'));
     if CONFIG.verbose || CONFIG.debug {
         println!("{}", "Processing lines:".blue());
         for line in &lines {
             println!("{}", line.green());
         }
     }
-
     let mut encoded_instructions = Vec::new();
     let mut line_count: u32 = 1; // bigger numbers with 32
     let mut write_to_file: bool = true; // defines if we should write to file (duh)
@@ -118,6 +162,23 @@ fn main() -> io::Result<()> {
     }
 
     Ok(())
+}
+fn read_include_file(file_name: &str) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let mut included_lines = Vec::new();
+    let file = File::open(file_name)?;
+    let reader = io::BufReader::new(file);
+
+    for line in reader.lines() {
+        match line {
+            Ok(content) => included_lines.push(content),
+            Err(e) => eprintln!(
+                "{} reading line from include file: {}",
+                "Error".red().bold(),
+                e.to_string().green()
+            ),
+        }
+    }
+    Ok(included_lines)
 }
 #[cfg(test)]
 mod tests {

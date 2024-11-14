@@ -1,5 +1,5 @@
-.ascii "pow pow pow"
-powwow:
+#include "blah.asm"
+    .ascii "pow pow pow"
     push #50
 pop %r7
 
