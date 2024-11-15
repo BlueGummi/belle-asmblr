@@ -35,9 +35,9 @@ pub fn add_check() {
     assert_eq!(result as u16, 0b0001110100000100);
 }
 #[test]
-pub fn and_check() {
+pub fn jge_check() {
     let result = encode_instruction(
-        &Token::Ident("and".to_string()),
+        &Token::Ident("jge".to_string()),
         Some(&Token::Register(4)),
         Some(&Token::Register(0)),
     );
@@ -119,6 +119,7 @@ pub fn int_check() {
         Some(&Token::Literal(1)),
         None,
     );
+    println!("{result}");
     assert_eq!(result as u16, 0b1101000100000001);
 }
 #[test]
