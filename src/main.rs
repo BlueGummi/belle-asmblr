@@ -16,7 +16,12 @@ fn main() -> io::Result<()> {
             println!("File is Some");
         }
         if !File::open(Path::new(CONFIG.file.as_ref().unwrap())).is_ok() {
-            println!("{}{}{}", "error: ".red().bold(), CONFIG.file.as_ref().unwrap().green(), " no such file or directory".red());
+            println!(
+                "{}{}{}",
+                "error: ".red().bold(),
+                CONFIG.file.as_ref().unwrap().green(),
+                " no such file or directory".red()
+            );
             std::process::exit(1);
         }
         let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
@@ -62,7 +67,7 @@ fn main() -> io::Result<()> {
                 Err(e) => {
                     eprintln!(
                         "{} reading line from file: {}",
-                        "Error".red().bold(),
+                        "error".red().bold(),
                         e.to_string().green()
                     );
                     has_err = true;
@@ -91,7 +96,15 @@ fn main() -> io::Result<()> {
     let mut write_to_file: bool = true; // defines if we should write to file (duh)
     for line in lines {
         let tokens = lex(&line, line_count);
-
+        if CONFIG.debug {
+            for token in &tokens {
+                println!(
+                    "{} {}",
+                    "Token:".green().bold(),
+                    token.to_string().blue().bold()
+                );
+            }
+        }
         let instruction = tokens.first();
         let operand1 = tokens.get(1);
         let operand2 = {
@@ -137,15 +150,7 @@ fn main() -> io::Result<()> {
                 line.to_string().green()
             );
         }
-        if CONFIG.debug {
-            for token in tokens {
-                println!(
-                    "{} {}",
-                    "Token:".green().bold(),
-                    token.to_string().blue().bold()
-                );
-            }
-        }
+
         line_count += 1; // line count exists so we can have line number errors
     }
     if has_err {
