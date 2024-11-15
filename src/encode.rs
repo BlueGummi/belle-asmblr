@@ -92,7 +92,6 @@ pub fn write_encoded_instructions_to_file(
     // pretty obvious
     let mut file = File::create(filename)?;
     file.write_all(encoded_instructions)?;
-    println!("Wrote to file.");
     Ok(())
 }
 pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token>) -> i16 {
@@ -122,7 +121,6 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
     let mut subr: bool = false;
     let mut is_st: bool = false;
     let mut is_label: bool = false;
-    let mut is_big_label: bool = false;
     let mut is_one_arg: bool = false;
     let instruction_bin = match ins {
         // first one will always be an instruction
@@ -131,8 +129,8 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             // explanatory
             "HLT" => HLT_OP, // 0
             "ADD" => ADD_OP, // 1
-            "AND" => AND_OP, // 2
-            "OR" => OR_OP,   // 3
+            "JGE" => JGE_OP, // 2
+            "CL" => CL_OP,   // 3
             "CALL" => {
                 if CONFIG.debug {
                     println!("this is a call!");
@@ -150,9 +148,9 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
                 is_one_arg = true;
                 PUSH_OP // 8
             }
-            "JZ" => {
+            "JNZ" => {
                 is_one_arg = true;
-                JZ_OP // 9
+                JNZ_OP // 9
             }
             "CMP" => CMP_OP, // 10
             "MUL" => MUL_OP, // 11
@@ -178,12 +176,8 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             }
             SR_OP
         }
-        Token::Label(l) => {
+        Token::Label(_) => {
             is_label = true;
-            if l == "ascii" || l == "asciiz" || l == "byte" {
-                is_big_label = true;
-                is_label = false;
-            }
             if CONFIG.debug {
                 println!("Keyword detected");
             }

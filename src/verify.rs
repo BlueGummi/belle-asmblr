@@ -17,7 +17,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-                "ADD" | "AND" | "OR" | "LD" | "ST" | "MOV" | "MUL" | "CMP" => {
+                "ADD" | "LD" | "ST" | "MOV" | "MUL" | "CMP" => {
                     if !is_arg(arg1) | !is_arg(arg2) {
                         err_msg = format!("{} requires two arguments", raw_token);
                         has_error = true;
@@ -31,7 +31,7 @@ pub fn verify(ins: &Token, arg1: Option<&Token>, arg2: Option<&Token>, line_num:
                         has_error = true;
                     }
                 }
-                "CALL" | "PUSH" | "JZ" | "POP" => {
+                "CALL" | "PUSH" | "JNZ" | "POP" | "CL" | "JGE" => {
                     if CONFIG.debug {
                         println!("arg1 {:?}, arg2 {:?}", arg1, arg2);
                     }

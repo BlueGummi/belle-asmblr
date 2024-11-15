@@ -106,7 +106,7 @@ pub fn st_check() {
 #[test]
 pub fn jz_check() {
     let result = encode_instruction(
-        &Token::Ident("jz".to_string()),
+        &Token::Ident("jnz".to_string()),
         Some(&Token::MemAddr(8)),
         None,
     );

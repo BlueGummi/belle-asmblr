@@ -11,20 +11,22 @@ fn main() -> io::Result<()> {
     }
     let mut lines: Vec<String> = Vec::new();
     let mut has_err: bool = false;
-
     if CONFIG.file.is_some() && !CONFIG.file.as_ref().unwrap().is_empty() {
         if CONFIG.debug {
             println!("File is Some");
         }
-        let file = File::open(&Path::new(CONFIG.file.as_ref().unwrap()))?;
+        if !File::open(Path::new(CONFIG.file.as_ref().unwrap())).is_ok() {
+            println!("{}{}{}", "error: ".red().bold(), CONFIG.file.as_ref().unwrap().green(), " no such file or directory".red());
+            std::process::exit(1);
+        }
+        let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
         let reader = io::BufReader::new(file);
         let include_regex = Regex::new(r#"^\s*#include\s+"([^"]+)""#).unwrap();
         for line in reader.lines() {
             match line {
                 Ok(content) => {
-                    let trimmed_content = content.trim();
-                    if trimmed_content.starts_with("#include") {
-                        if let Some(captures) = include_regex.captures(trimmed_content) {
+                    if content.trim().starts_with("#include") {
+                        if let Some(captures) = include_regex.captures(content.trim()) {
                             let include_file = captures[1].to_string();
                             if let Ok(included_lines) = read_include_file(&include_file) {
                                 lines.extend(included_lines);
@@ -52,7 +54,7 @@ fn main() -> io::Result<()> {
                 }
             }
         }
-        let file = File::open(&Path::new(CONFIG.file.as_ref().unwrap()))?;
+        let file = File::open(Path::new(CONFIG.file.as_ref().unwrap()))?;
         let reader = io::BufReader::new(file);
         for line in reader.lines() {
             match line {
