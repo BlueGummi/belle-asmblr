@@ -50,7 +50,8 @@ pub fn cl_check() {
         Some(&Token::Literal(2)),
         None,
     );
-    assert_eq!(result as u16, 0b0011 010010000111);
+    println!("{result:b}");
+    assert_eq!(result.abs() as u16, 0b0011000100000010);
 }
 #[test]
 pub fn mul_check() {

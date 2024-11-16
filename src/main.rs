@@ -85,6 +85,7 @@ fn main() -> io::Result<()> {
     }
     lines.retain(|line| !line.starts_with(';'));
     lines.retain(|line| !line.starts_with('#'));
+    lines.remove(0); // removes the first line
     if CONFIG.verbose || CONFIG.debug {
         println!("{}", "Processing lines:".blue());
         for line in &lines {

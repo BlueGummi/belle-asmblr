@@ -39,3 +39,4 @@ cl #4
 	add %r3, #1
 	call @fib
 ret
+mov %r2, #4

@@ -130,8 +130,11 @@ pub fn encode_instruction(ins: &Token, reg1: Option<&Token>, reg2: Option<&Token
             "HLT" => HLT_OP, // 0
             "ADD" => ADD_OP, // 1
             "JGE" => JGE_OP, // 2
-            "CL" => CL_OP,   // 3
-            "CALL" => {
+            "CL" => {
+                is_one_arg = true;
+                CL_OP   // 3
+            }
+                "CALL" => {
                 if CONFIG.debug {
                     println!("this is a call!");
                 }
