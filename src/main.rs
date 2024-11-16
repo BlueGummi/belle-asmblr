@@ -97,15 +97,7 @@ fn main() -> io::Result<()> {
     let mut write_to_file: bool = true; // defines if we should write to file (duh)
     for line in lines {
         let tokens = lex(&line, line_count);
-        if CONFIG.debug {
-            for token in &tokens {
-                println!(
-                    "{} {}",
-                    "Token:".green().bold(),
-                    token.to_string().blue().bold()
-                );
-            }
-        }
+
         let instruction = tokens.first();
         let operand1 = tokens.get(1);
         let operand2 = {
@@ -117,6 +109,18 @@ fn main() -> io::Result<()> {
         };
         if CONFIG.debug {
             println!("Raw line: {}", line.green());
+        }
+        if CONFIG.debug {
+            for (i, token) in tokens.iter().enumerate() {
+                print!(
+                    "{} {}",
+                    "Token:".green().bold(),
+                    token.to_string().blue().bold()
+                );
+                if i < tokens.len() - 1 {
+                    println!(); // only newline if not last token
+                }
+            }
         }
         if let Some(ins) = instruction {
             let encoded_instruction = encode_instruction(ins, operand1, operand2);
@@ -141,7 +145,7 @@ fn main() -> io::Result<()> {
                     println!("DTB: {}", dtb.blue().bold());
                 }
                 if let Some(src) = ins_str.get(8..15) {
-                    println!("SRC: {}", src.blue().bold());
+                    println!("SRC: {}\n", src.blue().bold());
                 }
             }
         } else {

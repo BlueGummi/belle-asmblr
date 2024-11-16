@@ -12,9 +12,6 @@ pub fn register_to_binary(reg: Option<&Token>) -> i16 {
             if *num > 8 {
                 eprintln!("{}", "Register value cannot be greater than 7".bold().red());
             }
-            if CONFIG.debug {
-                println!("REG {:b}", num);
-            }
             *num
         }
         // all looks good
