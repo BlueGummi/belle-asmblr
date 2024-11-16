@@ -44,13 +44,13 @@ pub fn jge_check() {
     assert_eq!(result as u16, 0b0010100000000000);
 }
 #[test]
-pub fn or_check() {
+pub fn cl_check() {
     let result = encode_instruction(
-        &Token::Ident("or".to_string()),
-        Some(&Token::Register(2)),
-        Some(&Token::MemPointer(7)),
+        &Token::Ident("cl".to_string()),
+        Some(&Token::Literal(2)),
+        None,
     );
-    assert_eq!(result as u16, 0b0011010010000111);
+    assert_eq!(result as u16, 0b0011 010010000111);
 }
 #[test]
 pub fn mul_check() {
